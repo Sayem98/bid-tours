@@ -2,16 +2,25 @@ import express, { NextFunction, Request, Response } from "express";
 import axois from "axios";
 import { AppError } from "./module.error/appError";
 import { globalErrorHandler } from "./module.error/errorController";
+import { channel, subscribe } from "./utils/channels";
 
 const app = express();
 
 app.use(express.json()); // For JSON data
 app.use(express.urlencoded({ extended: true })); // For form data
 
+const subscriber = async () => {
+  const _channel = await channel();
+  subscribe(_channel, (data) => {});
+};
+
+subscriber();
+
 app.get(
   "/api/v1/tours",
   async (req: Request, res: Response, next: NextFunction) => {
     // Send event to auth
+
     axois.post("http://localhost:3000/users/events", {
       payload: {
         event: "ADD_TO_WISHLIST",
