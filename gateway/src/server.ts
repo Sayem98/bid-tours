@@ -7,7 +7,7 @@ app.use(express.json()); // For JSON data
 
 app.use(
   "/auth",
-  proxy("http://localhost:3001", {
+  proxy("https://employee-service-501488026360.us-central1.run.app", {
     proxyReqPathResolver: (req) => {
       console.log(`/api/v1${req.url}`);
       return `/api/v1/auth${req.url}`;
