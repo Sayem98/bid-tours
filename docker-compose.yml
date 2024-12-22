@@ -1,0 +1,66 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management # RabbitMQ image with management plugin
+    container_name: rabbitmq
+    ports:
+      - "15672:15672" # Management console
+      - "5672:5672" # AMQP protocol port
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:5.0 # MongoDB image
+    container_name: mongodb
+    ports:
+      - "27017:27017" # Default MongoDB port
+    networks:
+      - app-network
+    volumes:
+      - mongo_data:/data/db # Persist MongoDB data
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  auth-service:
+    build:
+      context: ./auth # Build the auth service from the ./auth directory
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    networks:
+      - app-network
+    env_file:
+      - ./auth/.env.dev
+    depends_on:
+      - rabbitmq # RabbitMQ dependency
+      - mongodb # MongoDB dependency
+
+  tour-service:
+    build:
+      context: ./tour # Build the tour service from the ./tour directory
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8000"
+    networks:
+      - app-network
+    env_file:
+      - ./tour/.env.dev
+    depends_on:
+      - rabbitmq # RabbitMQ dependency
+      - mongodb # MongoDB dependency
+      - auth-service # Auth service dependency
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:

@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./dist/server.js",
-    "start:dev": "env-cmd -f ./config.dev.env nodemon",
+    "start:dev": "env-cmd -f ./.env.dev nodemon",
     "start:prod": "env-cmd -f ./config.prod.env node ./dist/server.js",
     "build": "tsc"
   },

@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import type { Mongoose } from "mongoose";
 dotenv.config();
 import { app } from "./app";
+import { channel, subscribe } from "./utils/channels";
 
 const local_db = process.env.DATABASE_LOCAL || "";
 mongoose
@@ -10,6 +11,14 @@ mongoose
   .then((con: Mongoose) => {
     console.log("DB connection successful", con.connection.host);
   });
+
+const subscriber = async () => {
+  console.log("Subscribing to channel");
+  const _channel = await channel();
+  subscribe(_channel, (data) => {}, "auth_queue");
+};
+
+subscriber();
 
 const PORT = process.env.PORT || 3001;
 

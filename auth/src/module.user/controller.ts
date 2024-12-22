@@ -23,14 +23,12 @@ const createAUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = await createUser(req.body as IUserInput);
     const authChannel = await channel();
-    if (!TOUR_BINDING_KEY) {
-      throw new Error("USER_BINDING_KEY is not defined");
-    }
+
     if (!user?._id) {
       throw new Error("User not created");
     }
     const payload = await GetUserPayload(user._id.toString(), "USER_CREATED");
-    publish(authChannel, TOUR_BINDING_KEY, JSON.stringify(payload));
+    publish(authChannel, JSON.stringify(payload));
 
     res.status(201).json({
       status: "success",
